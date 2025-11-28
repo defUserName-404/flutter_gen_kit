@@ -1,0 +1,5 @@
+const String l10nYamlTemplate = '''
+arb-dir: assets/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+''';
