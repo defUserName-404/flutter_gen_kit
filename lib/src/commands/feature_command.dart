@@ -1,7 +1,9 @@
 import 'package:args/command_runner.dart';
 import 'package:flutter_gen_kit/src/models/gen_kit_config.dart';
 import 'package:flutter_gen_kit/src/templates/feature_templates.dart';
+import 'package:flutter_gen_kit/src/templates/feature_templates.dart';
 import 'package:flutter_gen_kit/src/utils/file_utils.dart';
+import 'package:flutter_gen_kit/src/utils/path_constants.dart';
 
 class FeatureCommand extends Command<void> {
   @override
@@ -29,17 +31,23 @@ class FeatureCommand extends Command<void> {
   Future<void> _generateFeature(String featureName) async {
     final featurePath = 'lib/features/$featureName';
 
+    // Load config
+    final config = await GenKitConfig.load();
+
     // Create directories
-    await FileUtils.createDirectories([
-      '$featurePath/data/datasources',
-      '$featurePath/data/dto',
-      '$featurePath/data/repositories',
-      '$featurePath/domain/entities',
-      '$featurePath/domain/repositories',
-      '$featurePath/domain/usecases',
-      '$featurePath/presentation/screens',
-      '$featurePath/presentation/viewmodels',
-    ]);
+    if (config.architecture == Architecture.mvvm) {
+      await FileUtils.createDirectories(
+        PathConstants.mvvmFeatureDirectories
+            .map((path) => '$featurePath/$path')
+            .toList(),
+      );
+    } else {
+      await FileUtils.createDirectories(
+        PathConstants.cleanFeatureDirectories
+            .map((path) => '$featurePath/$path')
+            .toList(),
+      );
+    }
 
     // Helper to capitalize first letter
     String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
@@ -58,9 +66,6 @@ class FeatureCommand extends Command<void> {
     final featureNamePascal = toPascalCase(featureName);
     final featureNameCamel = toCamelCase(featureName);
 
-    // Load config
-    final config = await GenKitConfig.load();
-
     // Replace placeholders
     String processTemplate(String template) {
       return template
@@ -70,31 +75,57 @@ class FeatureCommand extends Command<void> {
     }
 
     // Write files
-    await FileUtils.writeFile(
-        '$featurePath/domain/entities/${featureName}_entity.dart',
-        processTemplate(getSampleEntityTemplate(config)));
-    await FileUtils.writeFile(
-        '$featurePath/domain/repositories/${featureName}_repository.dart',
-        processTemplate(getSampleRepositoryTemplate(config)));
-    await FileUtils.writeFile(
-        '$featurePath/domain/usecases/get_${featureName}_data.dart',
-        processTemplate(getGetSampleDataUseCaseTemplate(config)));
-    await FileUtils.writeFile('$featurePath/data/dto/${featureName}_dto.dart',
-        processTemplate(getSampleDtoTemplate(config)));
-    await FileUtils.writeFile(
-        '$featurePath/data/datasources/${featureName}_local_datasource.dart',
-        processTemplate(getSampleLocalDataSourceTemplate(config)));
-    await FileUtils.writeFile(
-        '$featurePath/data/datasources/${featureName}_remote_datasource.dart',
-        processTemplate(getSampleRemoteDataSourceTemplate(config)));
-    await FileUtils.writeFile(
-        '$featurePath/data/repositories/${featureName}_repository_impl.dart',
-        processTemplate(getSampleRepositoryImplTemplate(config)));
-    await FileUtils.writeFile(
-        '$featurePath/presentation/viewmodels/${featureName}_viewmodel.dart',
-        processTemplate(getSampleViewModelTemplate(config)));
-    await FileUtils.writeFile(
-        '$featurePath/presentation/screens/${featureName}_screen.dart',
-        processTemplate(getSampleScreenTemplate(config)));
+    if (config.architecture == Architecture.mvvm) {
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants.mvvmModels}/${featureName}_model.dart',
+          processTemplate(getSampleModelTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .mvvmRepositories}/${featureName}_repository.dart',
+          processTemplate(getSampleMVVMRepositoryTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .mvvmViewModels}/${featureName}_viewmodel.dart',
+          processTemplate(getSampleMVVMViewModelTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants.mvvmViews}/${featureName}_screen.dart',
+          processTemplate(getSampleMVVMScreenTemplate(config)));
+    } else {
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .cleanDomainEntities}/${featureName}_entity.dart',
+          processTemplate(getSampleEntityTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .cleanDomainRepositories}/${featureName}_repository.dart',
+          processTemplate(getSampleRepositoryTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .cleanDomainUsecases}/get_${featureName}_data.dart',
+          processTemplate(getGetSampleDataUseCaseTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants.cleanDataDto}/${featureName}_dto.dart',
+          processTemplate(getSampleDtoTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .cleanDataDatasources}/${featureName}_local_datasource.dart',
+          processTemplate(getSampleLocalDataSourceTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .cleanDataDatasources}/${featureName}_remote_datasource.dart',
+          processTemplate(getSampleRemoteDataSourceTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .cleanDataRepositories}/${featureName}_repository_impl.dart',
+          processTemplate(getSampleRepositoryImplTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .cleanPresentationViewModels}/${featureName}_viewmodel.dart',
+          processTemplate(getSampleViewModelTemplate(config)));
+      await FileUtils.writeFile(
+          '$featurePath/${PathConstants
+              .cleanPresentationScreens}/${featureName}_screen.dart',
+          processTemplate(getSampleScreenTemplate(config)));
+    }
   }
 }
