@@ -275,6 +275,186 @@ class SampleScreen extends StatefulWidget {
   State<SampleScreen> createState() => _SampleScreenState();
 }
 
+}
+''';
+}
+
+// --- MVVM Templates ---
+
+String getSampleModelTemplate(GenKitConfig config) {
+  return r'''
+import 'package:json_annotation/json_annotation.dart';
+
+part 'sample_feature_model.g.dart';
+
+@JsonSerializable
+(
+)
+
+class SampleModel {
+  final String id;
+  final String name;
+
+  SampleModel({required this.id, required this.name});
+
+  factory SampleModel.fromJson(Map<String, dynamic> json) =>
+      _$SampleModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SampleModelToJson(this);
+}
+  ''';
+}
+
+String getSampleMVVMRepositoryTemplate(GenKitConfig config) {
+  return r'''
+import '../models/sample_feature_model.dart';
+
+class SampleRepository {
+  Future<SampleModel> getSampleData() async {
+    // Simulate API call
+    await Future.delayed(const Duration(seconds: 1));
+    return SampleModel(id: '1', name: 'MVVM Data');
+  }
+}
+  ''';
+}
+
+String getSampleMVVMViewModelTemplate(GenKitConfig config) {
+  if (config.stateManagement == StateManagement.riverpod) {
+    return r'''
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/sample_feature_model.dart';
+import '../repositories/sample_feature_repository.dart';
+
+final sampleRepositoryProvider = Provider((ref) => SampleRepository());
+
+final sampleViewModelProvider = StateNotifierProvider<
+    SampleViewModel,
+    AsyncValue<SampleModel?>>((ref) {
+  return SampleViewModel(repository: ref.read(sampleRepositoryProvider));
+});
+
+class SampleViewModel extends StateNotifier<AsyncValue<SampleModel?>> {
+  final SampleRepository repository;
+
+  SampleViewModel({required this.repository})
+      : super(const AsyncValue.data(null));
+
+  Future<void> fetchSampleData() async {
+    state = const AsyncValue.loading();
+    try {
+      final data = await repository.getSampleData();
+      state = AsyncValue.data(data);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+}
+  ''';
+  }
+
+  // Default Provider
+  return r'''
+import 'package:flutter/material.dart';
+import '../models/sample_feature_model.dart';
+import '../repositories/sample_feature_repository.dart';
+
+class SampleViewModel extends ChangeNotifier {
+  final SampleRepository repository;
+
+  SampleViewModel({required this.repository});
+
+  SampleModel? _sampleData;
+
+  SampleModel? get sampleData => _sampleData;
+
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  String? _errorMessage;
+
+  String? get errorMessage => _errorMessage;
+
+  Future<void> fetchSampleData() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _sampleData = await repository.getSampleData();
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+}
+  ''';
+}
+
+String getSampleMVVMScreenTemplate(GenKitConfig config) {
+  if (config.stateManagement == StateManagement.riverpod) {
+    return r'''
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../viewmodels/sample_feature_viewmodel.dart';
+
+class SampleScreen extends ConsumerStatefulWidget {
+  const SampleScreen({super.key});
+
+  @override
+  ConsumerState<SampleScreen> createState() => _SampleScreenState();
+}
+
+class _SampleScreenState extends ConsumerState<SampleScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(sampleViewModelProvider.notifier).fetchSampleData();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(sampleViewModelProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('MVVM Feature')),
+      body: state.when(
+        data: (data) {
+          if (data == null) return const Center(child: Text('Press button'));
+          return Center(child: Text('Data: ${data.name}'));
+        },
+        error: (err, stack) => Center(child: Text('Error: $err')),
+        loading: () => const Center(child: CircularProgressIndicator()),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () =>
+            ref.read(sampleViewModelProvider.notifier).fetchSampleData(),
+        child: const Icon(Icons.refresh),
+      ),
+    );
+  }
+}
+  ''';
+  }
+
+  // Default Provider
+  return r'''
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodels/sample_feature_viewmodel.dart';
+
+class SampleScreen extends StatefulWidget {
+  const SampleScreen({super.key});
+
+  @override
+  State<SampleScreen> createState() => _SampleScreenState();
+}
+
 class _SampleScreenState extends State<SampleScreen> {
   @override
   void initState() {
@@ -288,12 +468,12 @@ class _SampleScreenState extends State<SampleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sample Feature'),
+        title: const Text('MVVM Feature'),
       ),
       body: Consumer<SampleViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
-            return const LoadingIndicator();
+            return const Center(child: CircularProgressIndicator());
           } else if (viewModel.errorMessage != null) {
             return Center(
               child: Text('Error: ${viewModel.errorMessage}'),
@@ -315,5 +495,5 @@ class _SampleScreenState extends State<SampleScreen> {
     );
   }
 }
-''';
+  ''';
 }
