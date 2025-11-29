@@ -3,10 +3,10 @@ import '../../../../models/gen_kit_config.dart';
 String getSampleRemoteDataSourceTemplate(GenKitConfig config) {
   return r'''
 import '../../../../core/network/api_client.dart';
-import '../models/sample_feature_model.dart';
+import '../dto/sample_feature_dto.dart';
 
 abstract class SampleRemoteDataSource {
-  Future<SampleModel> getSampleData();
+  Future<SampleDto> getSampleData();
 }
 
 class SampleRemoteDataSourceImpl implements SampleRemoteDataSource {
@@ -15,7 +15,7 @@ class SampleRemoteDataSourceImpl implements SampleRemoteDataSource {
   SampleRemoteDataSourceImpl({required this.apiClient});
 
   @override
-  Future<SampleModel> getSampleData() async {
+  Future<SampleDto> getSampleData() async {
     throw UnimplementedError();
   }
 }

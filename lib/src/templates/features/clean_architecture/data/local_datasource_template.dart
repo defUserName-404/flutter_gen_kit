@@ -4,11 +4,11 @@ String getSampleLocalDataSourceTemplate(GenKitConfig config) {
   return r'''
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../common/data/exceptions/app_exceptions.dart';
-import '../models/sample_feature_model.dart';
+import '../dto/sample_feature_dto.dart';
 
 abstract class SampleLocalDataSource {
-  Future<SampleModel> getSampleData();
-  Future<void> cacheSampleData(SampleModel model);
+  Future<SampleDto> getSampleData();
+  Future<void> cacheSampleData(SampleDto dto);
 }
 
 class SampleLocalDataSourceImpl implements SampleLocalDataSource {
@@ -17,12 +17,12 @@ class SampleLocalDataSourceImpl implements SampleLocalDataSource {
   SampleLocalDataSourceImpl({required this.sharedPreferences});
 
   @override
-  Future<SampleModel> getSampleData() {
+  Future<SampleDto> getSampleData() {
     throw UnimplementedError();
   }
 
   @override
-  Future<void> cacheSampleData(SampleModel model) {
+  Future<void> cacheSampleData(SampleDto dto) {
     throw UnimplementedError();
   }
 }

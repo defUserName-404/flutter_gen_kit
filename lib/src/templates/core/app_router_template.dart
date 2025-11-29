@@ -1,8 +1,15 @@
-const String appRouterTemplate = r'''
+import '../../models/architecture_config.dart';
+import '../../models/gen_kit_config.dart';
+
+String getAppRouterTemplate(GenKitConfig config) {
+  final archConfig = ArchitectureConfig.fromGenKitConfig(config);
+  final screenPath = archConfig.getScreenImportPath('sample_feature');
+
+  return '''
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 
-import '../../features/sample_feature/presentation/screens/sample_screen.dart'; // Example
+import '$screenPath'; // Example
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -26,3 +33,4 @@ class AppRouter {
   );
 }
 ''';
+}

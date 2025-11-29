@@ -15,25 +15,29 @@ dependencies:
     sdk: flutter
 
   # State Management
-  provider: ^6.0.5 # Or latest stable version
+  provider: ^6.0.5
 
   # Dependency Injection
-  get_it: ^7.2.0 # Or latest stable version
+  get_it: ^7.2.0
 
   # Routing
-  go_router: ^12.0.0 # Or latest stable version
+  go_router: ^12.0.0
 
   # API & Networking
-  dio: ^5.0.0 # Or latest stable version
-  internet_connection_checker_plus: ^2.0.0 # Or latest stable version
+  dio: ^5.0.0
+  internet_connection_checker_plus: ^2.0.0
 
   # Logging
-  logger: ^2.0.0 # Or latest stable version
+  logger: ^2.0.0
+
+  # Shared Preference
+  shared_preferences: ^2.0.15
+
 
   # Localization
   flutter_localizations:
     sdk: flutter
-  intl: ^0.20.2 # Or latest stable version
+  intl: ^0.20.2
 
   # Utility/Functional Programming
   dartz: ^0.10.1 # For functional error handling (Either, Left, Right)
@@ -43,7 +47,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^2.0.0
-  
+
   # Code generation for localization
   intl_translation: ^0.21.0 # For generating ARB files
 
@@ -55,11 +59,4 @@ flutter:
 
   assets:
     - assets/l10n/ # Folder for localization files
-
-# Localization configuration
-localization:
-  arb-dir: assets/l10n
-  output-class: S
-  output-localization-file: l10n.dart
-  synthetic-package: generated_l10n
 ''';
