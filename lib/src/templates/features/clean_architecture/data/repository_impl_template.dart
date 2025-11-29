@@ -19,7 +19,12 @@ class SampleRepositoryImpl implements SampleRepository {
 
   @override
   Future<SampleEntity> getSampleData() async {
-    throw UnimplementedError();
+    try {
+      final dto = await remoteDataSource.getSampleData();
+      return SampleEntityMapper.fromMap(dto.toMap());
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
   }
 }
 ''';

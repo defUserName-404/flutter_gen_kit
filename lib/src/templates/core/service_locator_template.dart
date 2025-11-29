@@ -26,14 +26,13 @@ class ServiceLocator {
     // External dependencies
     final sharedPreferences = await SharedPreferences.getInstance();
     _sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
-    _sl.registerLazySingleton<InternetConnectionCheckerPlus>(() => InternetConnectionCheckerPlus());
     _sl.registerLazySingleton<Dio>(() => Dio());
 
     // Core services
     _sl.registerLazySingleton<AppLogger>(() => AppLogger());
     _sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(_sl()));
     _sl.registerLazySingleton<ApiClient>(() => ApiClient(_sl(), _sl()));
-    
+
     // Feature-specific dependencies
     _setupSampleFeature();
   }

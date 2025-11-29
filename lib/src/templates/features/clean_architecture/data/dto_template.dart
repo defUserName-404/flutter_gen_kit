@@ -2,21 +2,20 @@ import '../../../../models/gen_kit_config.dart';
 
 String getSampleDtoTemplate(GenKitConfig config) {
   return r'''
-import 'package:json_annotation/json_annotation.dart';
+import 'package:dart_mappable/dart_mappable.dart';
+import '../../domain/entities/sample_feature_entity.dart';
 
-part 'sample_feature_dto.g.dart';
+part 'sample_feature_dto.mapper.dart';
 
-@JsonSerializable()
-class SampleDto {
-  @JsonKey(name: 'id')
+@MappableClass()
+class SampleDto with SampleDtoMappable {
   final String id;
-  @JsonKey(name: 'name')
   final String name;
 
-  SampleDto({required this.id, required this.name});
+  const SampleDto({required this.id, required this.name});
 
-  factory SampleDto.fromJson(Map<String, dynamic> json) => _$SampleDtoFromJson(json);
-  Map<String, dynamic> toJson() => _$SampleDtoToJson(this);
+  static const fromMap = SampleDtoMapper.fromMap;
+  static const fromJson = SampleDtoMapper.fromJson;
 }
 ''';
 }

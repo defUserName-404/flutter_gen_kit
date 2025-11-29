@@ -2,16 +2,16 @@ import '../../../../models/gen_kit_config.dart';
 
 String getSampleEntityTemplate(GenKitConfig config) {
   return r'''
-import 'package:equatable/equatable.dart';
+import 'package:dart_mappable/dart_mappable.dart';
 
-class SampleEntity extends Equatable {
+part 'sample_feature_entity.mapper.dart';
+
+@MappableClass()
+class SampleEntity with SampleEntityMappable {
   final String id;
   final String name;
 
   const SampleEntity({required this.id, required this.name});
-
-  @override
-  List<Object?> get props => [id, name];
 }
 ''';
 }

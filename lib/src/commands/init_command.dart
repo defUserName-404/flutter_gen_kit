@@ -127,6 +127,11 @@ class InitCommand extends Command<void> {
       await ShellUtils.runCommand('flutter', ['pub', 'add', 'provider']);
     }
 
+    // Add dart_mappable dependencies
+    await ShellUtils.runCommand('flutter', ['pub', 'add', 'dart_mappable']);
+    await ShellUtils.runCommand('flutter', ['pub', 'add', 'dev:build_runner']);
+    await ShellUtils.runCommand('flutter', ['pub', 'add', 'dev:dart_mappable_builder']);
+
     await ShellUtils.runCommand('flutter', ['pub', 'get']);
     print('Generating localization files...');
     await ShellUtils.runCommand('flutter', ['gen-l10n']);
@@ -141,7 +146,6 @@ class InitCommand extends Command<void> {
     // Core directories (Shared)
     await FileUtils.createDirectories(PathConstants.coreDirectories);
 
-    // TODO: Add support for other architectures
     // Architecture specific directories
     // MVVM
     if (config.architecture == Architecture.mvvm) {
@@ -168,7 +172,7 @@ class InitCommand extends Command<void> {
     await FileUtils.writeFile('lib/core/app.dart', coreAppTemplate);
     await FileUtils.writeFile(
       'lib/core/app_providers.dart',
-      appProvidersTemplate,
+      getAppProvidersTemplate(config),
     );
     await FileUtils.writeFile(
       'lib/core/service_locator.dart',
@@ -180,7 +184,7 @@ class InitCommand extends Command<void> {
     );
     await FileUtils.writeFile(
       'lib/core/router/app_router.dart',
-      appRouterTemplate,
+      getAppRouterTemplate(config),
     );
     await FileUtils.writeFile(
       'lib/core/theme/app_theme.dart',
