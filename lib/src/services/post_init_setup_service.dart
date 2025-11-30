@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_gen_kit/src/services/user_prompt_service.dart';
 import 'package:flutter_gen_kit/src/utils/shell_utils.dart';
 
 /// Service for handling post-initialization setup tasks like
@@ -14,27 +15,15 @@ class PostInitSetupService {
 
   /// Setup native splash screen with user-provided configuration.
   static Future<void> setupNativeSplash() async {
-    print('\n--- Native Splash Screen Setup ---');
-    stdout.write('Add flutter_native_splash? (y/N): ');
-    final response = stdin.readLineSync()?.toLowerCase();
-    if (response != 'y') return;
-
-    stdout.write('Enter background color (hex, e.g., #ffffff): ');
-    final color = stdin.readLineSync();
-    if (color == null || color.isEmpty) {
-      print('Skipping native splash setup (no color provided).');
-      return;
-    }
-
-    stdout.write('Enter splash image path (optional, press enter to skip): ');
-    final imagePath = stdin.readLineSync();
+    final config = UserPromptService.promptNativeSplash();
+    if (config == null) return;
 
     await _ensureAssetsDirectory();
 
     bool hasImage = false;
-    if (imagePath != null && imagePath.isNotEmpty) {
+    if (config.imagePath != null) {
       hasImage = await _copyAsset(
-        sourcePath: imagePath,
+        sourcePath: config.imagePath!,
         destPath: 'assets/splash.png',
         assetName: 'splash image',
       );
@@ -45,7 +34,7 @@ class PostInitSetupService {
     await _appendToPubspec('''
 
 flutter_native_splash:
-  color: "$color"${hasImage ? '\n  image: assets/splash.png' : ''}''');
+  color: "${config.color}"${hasImage ? '\n  image: assets/splash.png' : ''}''');
 
     print('Generating native splash screen...');
     await ShellUtils.runCommand('dart', [
@@ -56,17 +45,8 @@ flutter_native_splash:
 
   /// Setup launcher icons with user-provided icon image.
   static Future<void> setupLauncherIcons() async {
-    print('\n--- Launcher Icons Setup ---');
-    stdout.write('Add flutter_launcher_icons? (y/N): ');
-    final response = stdin.readLineSync()?.toLowerCase();
-    if (response != 'y') return;
-
-    stdout.write('Enter icon image path: ');
-    final imagePath = stdin.readLineSync();
-    if (imagePath == null || imagePath.isEmpty) {
-      print('Skipping launcher icons setup (no image path provided).');
-      return;
-    }
+    final imagePath = UserPromptService.promptLauncherIcons();
+    if (imagePath == null) return;
 
     final sourceFile = File(imagePath);
     if (!await sourceFile.exists()) {
@@ -101,17 +81,8 @@ flutter_launcher_icons:
 
   /// Setup package name change with user-provided package name.
   static Future<void> setupPackageName() async {
-    print('\n--- Package Name Setup ---');
-    stdout.write('Change app package name? (y/N): ');
-    final response = stdin.readLineSync()?.toLowerCase();
-    if (response != 'y') return;
-
-    stdout.write('Enter new package name (e.g., com.example.app): ');
-    final packageName = stdin.readLineSync();
-    if (packageName == null || packageName.isEmpty) {
-      print('Skipping package name change (no name provided).');
-      return;
-    }
+    final packageName = UserPromptService.promptPackageName();
+    if (packageName == null) return;
 
     await _addDevDependency('change_app_package_name');
 

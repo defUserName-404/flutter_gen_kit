@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter_gen_kit/src/models/platform_config.dart';
+
 enum Architecture {
   clean,
   mvvm,
@@ -14,10 +16,12 @@ enum StateManagement {
 class GenKitConfig {
   final Architecture architecture;
   final StateManagement stateManagement;
+  final PlatformConfig? platformConfig;
 
   GenKitConfig({
     required this.architecture,
     required this.stateManagement,
+    this.platformConfig,
   });
 
   factory GenKitConfig.fromJson(Map<String, dynamic> json) {
@@ -30,6 +34,9 @@ class GenKitConfig {
         (e) => e.name == json['state_management'],
         orElse: () => StateManagement.provider,
       ),
+      platformConfig: json['platform_config'] != null
+          ? PlatformConfig.fromJson(json['platform_config'])
+          : null,
     );
   }
 
@@ -37,6 +44,7 @@ class GenKitConfig {
     return {
       'architecture': architecture.name,
       'state_management': stateManagement.name,
+      if (platformConfig != null) 'platform_config': platformConfig!.toJson(),
     };
   }
 
@@ -68,6 +76,9 @@ class GenKitConfig {
     final buffer = StringBuffer();
     buffer.writeln('architecture: ${architecture.name}');
     buffer.writeln('state_management: ${stateManagement.name}');
+    if (platformConfig != null && platformConfig!.hasCustomPlatforms) {
+      buffer.writeln('platforms: ${platformConfig!.platforms.join(',')}');
+    }
     await file.writeAsString(buffer.toString());
   }
 }
