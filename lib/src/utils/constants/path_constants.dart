@@ -37,6 +37,7 @@ class PathConstants {
   static const String cleanDomainUsecases = 'domain/usecases';
   static const String cleanPresentationScreens = 'presentation/screens';
   static const String cleanPresentationViewModels = 'presentation/viewmodels';
+  static const String cleanPresentationBloc = 'presentation/bloc';
 
   static const List<String> cleanFeatureDirectories = [
     cleanDataDatasources,
@@ -47,6 +48,7 @@ class PathConstants {
     cleanDomainUsecases,
     cleanPresentationScreens,
     cleanPresentationViewModels,
+    cleanPresentationBloc,
   ];
 
   // Core File Paths

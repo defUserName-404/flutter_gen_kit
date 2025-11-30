@@ -31,6 +31,9 @@ import 'package:flutter_gen_kit/src/templates/features/mvvm/model_template.dart'
 import 'package:flutter_gen_kit/src/templates/features/mvvm/repository_template.dart';
 import 'package:flutter_gen_kit/src/templates/features/mvvm/screen_template.dart';
 import 'package:flutter_gen_kit/src/templates/features/mvvm/viewmodel_template.dart';
+import 'package:flutter_gen_kit/src/templates/features/bloc/bloc_template.dart';
+import 'package:flutter_gen_kit/src/templates/features/bloc/bloc_event_template.dart';
+import 'package:flutter_gen_kit/src/templates/features/bloc/bloc_state_template.dart';
 import 'package:flutter_gen_kit/src/utils/constants/path_constants.dart';
 
 class FileGenerator {
@@ -96,8 +99,19 @@ class FileGenerator {
           getSampleRemoteDataSourceTemplate(config);
       files['$featurePath/${PathConstants.cleanDataRepositories}/${featureName}_repository_impl.dart'] =
           getSampleRepositoryImplTemplate(config);
-      files['$featurePath/${PathConstants.cleanPresentationViewModels}/${featureName}_viewmodel.dart'] =
-          getSampleViewModelTemplate(config);
+
+      if (config.stateManagement == StateManagement.bloc) {
+         files['$featurePath/${PathConstants.cleanPresentationBloc}/${featureName}_bloc.dart'] =
+            getBlocTemplate(featureName, config);
+         files['$featurePath/${PathConstants.cleanPresentationBloc}/${featureName}_event.dart'] =
+            getBlocEventTemplate(featureName, config);
+         files['$featurePath/${PathConstants.cleanPresentationBloc}/${featureName}_state.dart'] =
+            getBlocStateTemplate(featureName, config);
+      } else {
+        files['$featurePath/${PathConstants.cleanPresentationViewModels}/${featureName}_viewmodel.dart'] =
+            getSampleViewModelTemplate(config);
+      }
+
       files['$featurePath/${PathConstants.cleanPresentationScreens}/${featureName}_screen.dart'] =
           getSampleScreenTemplate(config);
     }
