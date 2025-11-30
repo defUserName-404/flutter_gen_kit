@@ -221,3 +221,43 @@ class FeatureGenerationOptions {
     );
   }
 }
+
+/// Configuration for environment variable setup.
+class EnvSetupConfig {
+  final String apiBaseUrl;
+  final String appName;
+
+  const EnvSetupConfig({
+    required this.apiBaseUrl,
+    required this.appName,
+  });
+
+  /// Prompt user for environment variable setup.
+  static EnvSetupConfig? prompt(String projectName) {
+    final wantsEnv = Confirm(
+      prompt: 'Setup environment variables?',
+      defaultValue: true,
+    ).interact();
+
+    if (!wantsEnv) return null;
+
+    final apiBaseUrl = Input(
+      prompt: 'Enter API base URL',
+      defaultValue: 'https://api.example.com',
+      validator: (value) {
+        if (value.isEmpty) return false;
+        return true;
+      },
+    ).interact();
+
+    final appName = Input(
+      prompt: 'Enter app name',
+      defaultValue: projectName,
+    ).interact();
+
+    return EnvSetupConfig(
+      apiBaseUrl: apiBaseUrl,
+      appName: appName,
+    );
+  }
+}

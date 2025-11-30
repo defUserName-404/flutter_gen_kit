@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_gen_kit/src/services/env_setup_service.dart';
 import 'package:flutter_gen_kit/src/services/user_prompt_service.dart';
 import 'package:flutter_gen_kit/src/utils/shell_utils.dart';
 
@@ -7,10 +8,11 @@ import 'package:flutter_gen_kit/src/utils/shell_utils.dart';
 /// native splash, launcher icons, and package name changes.
 class PostInitSetupService {
   /// Run all post-initialization setup tasks interactively.
-  static Future<void> runAllSetups() async {
+  static Future<void> runAllSetups(String projectName) async {
     await setupNativeSplash();
     await setupLauncherIcons();
     await setupPackageName();
+    await setupEnvironment(projectName);
   }
 
   /// Setup native splash screen with user-provided configuration.
@@ -94,6 +96,25 @@ flutter_launcher_icons:
     ]);
   }
 
+  /// Setup environment variables with user-provided configuration.
+  static Future<void> setupEnvironment(String projectName) async {
+    final config = EnvSetupConfig.prompt(projectName);
+    if (config == null) return;
+
+    // Add flutter_dotenv dependency
+    print('Adding flutter_dotenv to dependencies...');
+    await ShellUtils.runCommand('flutter', ['pub', 'add', 'flutter_dotenv']);
+
+    // Setup environment files and config
+    await EnvSetupService.setupEnvironment(
+      apiBaseUrl: config.apiBaseUrl,
+      appName: config.appName,
+    );
+
+    // Update pubspec.yaml to include .env in assets
+    await _addEnvToAssets();
+  }
+
   // ========== Private Helper Methods ==========
 
   /// Ensure the assets directory exists, creating it if necessary.
@@ -136,5 +157,20 @@ flutter_launcher_icons:
       final existingContent = await pubspecFile.readAsString();
       await pubspecFile.writeAsString(existingContent + content);
     }
+  }
+
+  /// Add .env file to pubspec.yaml assets.
+  static Future<void> _addEnvToAssets() async {
+    final pubspecFile = File('pubspec.yaml');
+    if (!await pubspecFile.exists()) return;
+
+    final content = await pubspecFile.readAsString();
+    
+    // Check if .env is already in assets
+    if (content.contains('.env')) return;
+
+    // Add .env to assets section
+    final envAsset = '\n    - .env';
+    await pubspecFile.writeAsString(content + envAsset);
   }
 }

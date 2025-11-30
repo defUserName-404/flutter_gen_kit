@@ -55,6 +55,6 @@ class InitCommand extends Command<void> {
     print('\nProject "$projectName" initialized successfully!');
 
     // Post-initialization interactive setup
-    await PostInitSetupService.runAllSetups();
+    await PostInitSetupService.runAllSetups(projectName);
   }
 }
