@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:flutter_gen_kit/src/models/gen_kit_config.dart';
 import 'package:flutter_gen_kit/src/services/file_generator.dart';
+import 'package:flutter_gen_kit/src/services/post_init_setup_service.dart';
 import 'package:flutter_gen_kit/src/utils/constants/path_constants.dart';
 import 'package:flutter_gen_kit/src/utils/file_utils.dart';
 import 'package:flutter_gen_kit/src/utils/shell_utils.dart';
@@ -30,6 +31,28 @@ class InitCommand extends Command<void> {
     final projectName = argResults!['name'] as String;
 
     print('Initializing new Flutter project: $projectName...');
+
+    // Platform selection
+    print('\nSelect Platforms (space-separated, e.g., 1 2 3):');
+    print('[1] Android');
+    print('[2] iOS');
+    print('[3] Web');
+    print('[4] Windows');
+    print('[5] macOS');
+    print('[6] Linux');
+    stdout.write('Enter choices (default: all platforms): ');
+    final platformInput = stdin.readLineSync();
+
+    final List<String> platforms = [];
+    if (platformInput != null && platformInput.isNotEmpty) {
+      final choices = platformInput.split(' ').map((e) => e.trim()).toList();
+      if (choices.contains('1')) platforms.add('android');
+      if (choices.contains('2')) platforms.add('ios');
+      if (choices.contains('3')) platforms.add('web');
+      if (choices.contains('4')) platforms.add('windows');
+      if (choices.contains('5')) platforms.add('macos');
+      if (choices.contains('6')) platforms.add('linux');
+    }
 
     // Interactive prompts
     print('\nSelect Architecture:');
@@ -65,7 +88,16 @@ class InitCommand extends Command<void> {
     );
 
     // 1. Create a new Flutter project
-    await ShellUtils.runCommand('flutter', ['create', projectName]);
+    final createArgs = ['create'];
+
+    // Add platform-specific flags if user selected specific platforms
+    if (platforms.isNotEmpty) {
+      createArgs.add('--platforms=${platforms.join(',')}');
+    }
+
+    createArgs.add(projectName);
+
+    await ShellUtils.runCommand('flutter', createArgs);
     print('Flutter project "$projectName" created.');
 
     // Change directory to the newly created project
@@ -106,6 +138,9 @@ class InitCommand extends Command<void> {
     await ShellUtils.runCommand('flutter', ['gen-l10n']);
 
     print('Project "$projectName" initialized successfully!');
+
+    // Post-initialization interactive setup
+    await PostInitSetupService.runAllSetups();
   }
 
   Future<void> _applyArchitecture(
