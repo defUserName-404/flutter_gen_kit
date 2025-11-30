@@ -14,25 +14,21 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # State Management
-  provider: ^6.0.5
-
   # Dependency Injection
-  get_it: ^7.2.0
+  get_it: ^9.1.1
 
   # Routing
-  go_router: ^12.0.0
+  go_router: ^17.0.0
 
   # API & Networking
-  dio: ^5.0.0
-  internet_connection_checker_plus: ^2.0.0
+  dio: ^5.9.0
+  internet_connection_checker_plus: ^2.9.1
 
   # Logging
-  logger: ^2.0.0
+  logger: ^2.6.2
 
   # Shared Preference
   shared_preferences: ^2.0.15
-
 
   # Localization
   flutter_localizations:
