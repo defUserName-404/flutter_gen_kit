@@ -8,6 +8,7 @@ A powerful CLI tool for supercharging your Flutter development workflow. Automat
 - **🏗️ Flexible Architecture**: Choose between **Clean Architecture** (default) or **MVVM**.
 - **⚡ State Management Support**: Built-in support for **Provider**, **Riverpod**, and **Bloc**.
 - **🧩 Feature Generation**: Generate complete feature modules with a single command, tailored to your chosen architecture and state management.
+- **🎯 Mason-Powered Templates**: Uses industry-standard `mason` bricks for runtime template generation.
 - **🛠️ Best Practices**: Enforces separation of concerns, dependency injection, and clean code principles.
 - **🌐 Localization Ready**: Automatically sets up `flutter_localizations` and `l10n.yaml`.
 
@@ -83,6 +84,30 @@ The `gen_kit.yaml` file in your project root stores your project's configuration
 architecture: clean # or mvvm
 state_management: riverpod # or provider, bloc
 ```
+
+## Architecture
+
+### Mason Bricks
+
+Feature generation is powered by `mason` bricks located in the `bricks/` directory:
+
+- **`bricks/clean_architecture/`**: Clean Architecture pattern with 9 template files
+  - Domain layer (entities, repositories, use cases)
+  - Data layer (DTOs, data sources, repository implementations)
+  - Presentation layer (screens, view models)
+
+- **`bricks/mvvm/`**: MVVM pattern with 4 template files
+  - Models, repositories, view models, views
+
+Each brick supports both **Provider** and **Riverpod** state management through conditional template sections.
+
+### How It Works
+
+1. When you run `flutter_gen_kit feature --name my_feature`:
+2. The tool loads the appropriate mason brick based on your architecture config
+3. Variables are prepared (feature name in different cases: snake_case, PascalCase, camelCase)
+4. Mason generates all files from templates with variable substitution
+5. Build runner generates code for `dart_mappable` annotations
 
 ## Contributing
 
