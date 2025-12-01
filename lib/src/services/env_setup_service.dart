@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter_gen_kit/src/templates/core/app_config_template.dart';
+
 
 /// Service for setting up environment variables in Flutter projects.
 class EnvSetupService {
@@ -146,6 +146,21 @@ ENABLE_LOGGING=false
 
   static String _getAppConfigContent() {
     // Use the enhanced template from app_config_template.dart
-    return appConfigWithEnvTemplate;
+    // Use the enhanced template
+    return r'''
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+class AppConfig {
+  static String get appName => dotenv.env['APP_NAME'] ?? 'Flutter App';
+  static String get apiBaseUrl => dotenv.env['API_BASE_URL'] ?? 'https://api.example.com';
+  static int get apiTimeout => int.parse(dotenv.env['API_TIMEOUT'] ?? '30');
+  static String get environment => dotenv.env['ENVIRONMENT'] ?? 'development';
+  static bool get enableLogging => dotenv.env['ENABLE_LOGGING'] == 'true';
+
+  static Future<void> load() async {
+    await dotenv.load(fileName: ".env");
+  }
+}
+''';
   }
 }

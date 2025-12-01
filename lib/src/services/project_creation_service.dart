@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_gen_kit/src/models/gen_kit_config.dart';
 import 'package:flutter_gen_kit/src/models/platform_config.dart';
-import 'package:flutter_gen_kit/src/services/file_generator.dart';
+
+import 'package:flutter_gen_kit/src/services/mason_service.dart';
 import 'package:flutter_gen_kit/src/utils/constants/path_constants.dart';
 import 'package:flutter_gen_kit/src/utils/file_utils.dart';
 import 'package:flutter_gen_kit/src/utils/shell_utils.dart';
@@ -45,36 +46,20 @@ class ProjectCreationService {
     // Core directories (Shared)
     await FileUtils.createDirectories(PathConstants.coreDirectories);
 
-    // Architecture specific directories
-    if (config.architecture == Architecture.mvvm) {
-      await FileUtils.createDirectories(
-        PathConstants.mvvmFeatureDirectories
-            .map((path) => 'lib/features/$sampleFeatureDirectoryName/$path')
-            .toList(),
-      );
-    } else {
-      // Clean Architecture
-      await FileUtils.createDirectories(
-        PathConstants.cleanFeatureDirectories
-            .map((path) => 'lib/features/$sampleFeatureDirectoryName/$path')
-            .toList(),
-      );
-    }
-
-    // Write templates (Shared)
-    final coreFiles = FileGenerator.generateCoreFiles(projectName, config);
-    for (final entry in coreFiles.entries) {
-      await FileUtils.writeFile(entry.key, entry.value);
-    }
-
-    // Sample Feature
-    final featureFiles = FileGenerator.generateFeatureFiles(
-      sampleFeatureDirectoryName,
-      config,
+    // Write core templates using mason
+    print('Generating core files...');
+    final masonService = MasonService(config);
+    await masonService.generateCore(
+      projectName: projectName,
+      targetPath: '.',
     );
-    for (final entry in featureFiles.entries) {
-      await FileUtils.writeFile(entry.key, entry.value);
-    }
+
+    // Generate sample feature using mason
+    print('Generating sample feature...');
+    await masonService.generateFeature(
+      featureName: sampleFeatureDirectoryName,
+      targetPath: 'lib/features/$sampleFeatureDirectoryName',
+    );
   }
 
   /// Install dependencies based on configuration.

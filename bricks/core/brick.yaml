@@ -1,0 +1,19 @@
+name: core
+description: Core project structure and configuration files for Flutter GenKit
+version: 1.0.0
+
+vars:
+  project_name:
+    type: string
+    description: The name of the Flutter project
+    prompt: What is the project name?
+  
+  state_management:
+    type: string
+    description: State management solution
+    default: provider
+  
+  architecture:
+    type: string
+    description: Architecture type
+    default: clean
