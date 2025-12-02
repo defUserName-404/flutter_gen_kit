@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
-// Base ViewModel for common logic and ChangeNotifier
-abstract class BaseViewModel extends ChangeNotifier {
+import '../config/app_logger.dart';
+
+// Base View Model for common logic and ChangeNotifier
+abstract class BaseViewmodel extends ChangeNotifier {
+  final AppLogger logger;
   bool _isLoading = false;
   String? _errorMessage;
+
+  BaseModel(this.logger);
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -24,9 +29,9 @@ abstract class BaseViewModel extends ChangeNotifier {
     setErrorMessage(null);
     try {
       await block();
-    } catch (e) {
+    } catch (e, stackTrace) {
+      logger.e('Error in BaseModel', e, stackTrace);
       setErrorMessage(e.toString());
-      // Optionally log error here
     } finally {
       setLoading(false);
     }
