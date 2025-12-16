@@ -26,40 +26,27 @@ class {{feature_pascal}}ViewModel extends StateNotifier<AsyncValue<{{feature_pas
     }
   }
 }
-{{/riverpod}}{{^riverpod}}import 'package:flutter/material.dart';
+{{/riverpod}}{{^riverpod}}import '../../../../core/base/base_viewmodel.dart';
+import '../../../../core/config/app_logger.dart';
 import '../models/{{feature_name}}_model.dart';
 import '../repositories/{{feature_name}}_repository.dart';
 
-class {{feature_pascal}}ViewModel extends ChangeNotifier {
+class {{feature_pascal}}ViewModel extends BaseViewModel {
   final {{feature_pascal}}Repository repository;
 
-  {{feature_pascal}}ViewModel({required this.repository});
+  {{feature_pascal}}ViewModel({
+    required this.repository,
+    required AppLogger logger,
+  }) : super(logger);
 
   {{feature_pascal}}Model? _{{feature_camel}}Data;
 
   {{feature_pascal}}Model? get {{feature_camel}}Data => _{{feature_camel}}Data;
 
-  bool _isLoading = false;
-
-  bool get isLoading => _isLoading;
-
-  String? _errorMessage;
-
-  String? get errorMessage => _errorMessage;
-
   Future<void> fetch{{feature_pascal}}Data() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
+    await runCatching(() async {
       _{{feature_camel}}Data = await repository.get{{feature_pascal}}Data();
-    } catch (e) {
-      _errorMessage = e.toString();
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    });
   }
 }
 {{/riverpod}}

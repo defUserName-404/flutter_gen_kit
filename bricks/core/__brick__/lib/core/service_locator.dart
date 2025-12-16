@@ -47,13 +47,14 @@ class ServiceLocator {
       () => SampleRepositoryImpl(
         localDataSource: _sl(),
         remoteDataSource: _sl(),
+        logger: _sl(),
       ),
     );
 
     // Use cases
-    _sl.registerFactory(() => GetSampleData(repository: _sl()));
+    _sl.registerFactory(() => GetSampleData(repository: _sl(), logger: _sl()));
 
     // ViewModels
-    _sl.registerFactory(() => SampleViewModel(getSampleData: _sl()));
+    _sl.registerFactory(() => SampleViewModel(getSampleData: _sl(), logger: _sl()));
   }
 }

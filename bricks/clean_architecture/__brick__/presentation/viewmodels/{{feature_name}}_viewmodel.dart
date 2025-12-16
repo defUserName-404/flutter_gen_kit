@@ -21,13 +21,17 @@ class {{feature_pascal}}ViewModel extends StateNotifier<AsyncValue<{{feature_pas
   }
 }
 {{/riverpod}}{{^riverpod}}import '../../../../core/base/base_viewmodel.dart';
+import '../../../../core/config/app_logger.dart';
 import '../../domain/usecases/get_{{feature_name}}_data.dart';
 import '../../domain/entities/{{feature_name}}_entity.dart';
 
 class {{feature_pascal}}ViewModel extends BaseViewModel {
   final Get{{feature_pascal}}Data get{{feature_pascal}}Data;
 
-  {{feature_pascal}}ViewModel({required this.get{{feature_pascal}}Data});
+  {{feature_pascal}}ViewModel({
+    required this.get{{feature_pascal}}Data,
+    required AppLogger logger,
+  }) : super(logger);
 
   {{feature_pascal}}Entity? _{{feature_camel}}Data;
   {{feature_pascal}}Entity? get {{feature_camel}}Data => _{{feature_camel}}Data;
